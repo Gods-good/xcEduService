@@ -6,6 +6,7 @@ import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.manage_cms.dao.CmsPageRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -33,18 +34,30 @@ public class CmsPageService {
      * @return 页面列表
      */
     public QueryResponseResult findList(int page, int size, QueryPageRequest queryPageRequest){
+
+        if(queryPageRequest == null){
+            queryPageRequest = new QueryPageRequest();
+        }
         //分页查询
-        if(page<0){
+        if(page<=0){
             page = 1;
         }
         page = page -1 ;
-        if(size<0){
+        if(size<=0){
             page = 20;
         }
 
         //条件匹配器
-        ExampleMatcher exampleMatcher = ExampleMatcher.matching();
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching().withMatcher("pageAliase",ExampleMatcher.GenericPropertyMatchers.contains());
         CmsPage cmsPage = new CmsPage();
+        //判断如果传入站点id，讲站点id赋值到cmsPage查询值对象
+        if(StringUtils.isNotEmpty(queryPageRequest.getSiteId())){
+            cmsPage.setSiteId(queryPageRequest.getSiteId());
+        }
+        if(StringUtils.isNotEmpty(queryPageRequest.getPageAliase())){
+            cmsPage.setPageAliase(queryPageRequest.getPageAliase());
+        }
+
 //        cmsPage.setSiteId("页面");
         Example<CmsPage> example = Example.of(cmsPage,exampleMatcher);
         //分页参数

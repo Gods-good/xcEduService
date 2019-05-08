@@ -1,5 +1,6 @@
 package com.xuecheng.api.config.cms;
 
+import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import io.swagger.annotations.Api;
@@ -26,5 +27,5 @@ public interface CmsPageControllerApi {
 
     })
     @GetMapping(API_PRE+"/list/{page}/{size}")
-    public QueryResponseResult findList(@PathVariable("page")int page, @PathVariable("size") int size, QueryPageRequest queryPageRequest);
+    public QueryResponseResult<CmsPage> findList(@PathVariable("page")int page, @PathVariable("size") int size, QueryPageRequest queryPageRequest);
 }
