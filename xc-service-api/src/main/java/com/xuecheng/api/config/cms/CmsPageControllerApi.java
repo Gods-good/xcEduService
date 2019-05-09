@@ -2,6 +2,7 @@ package com.xuecheng.api.config.cms;
 
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
+import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -9,6 +10,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * @Description
@@ -28,4 +31,10 @@ public interface CmsPageControllerApi {
     })
     @GetMapping(API_PRE+"/list/{page}/{size}")
     public QueryResponseResult<CmsPage> findList(@PathVariable("page")int page, @PathVariable("size") int size, QueryPageRequest queryPageRequest);
+
+    //新增页面
+    @ApiOperation(value = "新增页面")
+    @PostMapping(API_PRE+"/add")
+    public CmsPageResult add(@RequestBody CmsPage cmsPage);
+
 }
