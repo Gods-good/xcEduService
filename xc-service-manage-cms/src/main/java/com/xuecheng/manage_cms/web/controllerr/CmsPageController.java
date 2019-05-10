@@ -29,4 +29,14 @@ public class CmsPageController implements CmsPageControllerApi {
     public CmsPageResult add(@RequestBody CmsPage cmsPage) {
         return cmsPageService.add(cmsPage);
     }
+
+    @Override
+    public CmsPageResult findById(String id) {
+        return cmsPageService.findByid(id);
+    }
+
+    @Override
+    public CmsPageResult edit(String id, CmsPage cmsPage) {
+        return cmsPageService.update(id,cmsPage);
+    }
 }
