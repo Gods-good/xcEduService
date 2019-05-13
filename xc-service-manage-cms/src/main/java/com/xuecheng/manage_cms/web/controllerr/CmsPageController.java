@@ -5,6 +5,7 @@ import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_cms.service.CmsPageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,12 +32,17 @@ public class CmsPageController implements CmsPageControllerApi {
     }
 
     @Override
-    public CmsPageResult findById(String id) {
+    public CmsPageResult findById(@PathVariable("id") String id) {
         return cmsPageService.findByid(id);
     }
 
     @Override
-    public CmsPageResult edit(String id, CmsPage cmsPage) {
+    public CmsPageResult edit(@PathVariable("id") String id, @RequestBody CmsPage cmsPage) {
         return cmsPageService.update(id,cmsPage);
+    }
+
+    @Override
+    public ResponseResult delete(@PathVariable("id") String id) {
+        return cmsPageService.delete(id);
     }
 }

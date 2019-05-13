@@ -6,6 +6,7 @@ import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_cms.dao.CmsPageRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +97,7 @@ public class CmsPageService {
 
     //根据id查询页面
     public CmsPageResult findByid(String id) {
-        CmsPage one = cmsPageRepository.findOne(id);
+         CmsPage one = cmsPageRepository.findOne(id);
         if (one != null) {
             return new CmsPageResult(CommonCode.SUCCESS, one);
         }
@@ -112,6 +113,8 @@ public class CmsPageService {
             one.setTemplateId(cmsPage.getTemplateId());
             //更新所属站点
             one.setSiteId(cmsPage.getSiteId());
+            //更新类型
+            one.setPageType(cmsPage.getPageType());
             //更新页面别名
             one.setPageAliase(cmsPage.getPageAliase());
             //更新访问路径
@@ -129,5 +132,16 @@ public class CmsPageService {
         //返回失败
         return new CmsPageResult(CommonCode.FAIL,null);
     }
+    //删除页面
+    public ResponseResult delete(String id){
 
+        CmsPage one = cmsPageRepository.findOne(id);
+
+        if (one!= null){
+            cmsPageRepository.delete(id);
+            return new ResponseResult(CommonCode.SUCCESS);
+        }
+        return new ResponseResult(CommonCode.FAIL);
+
+    }
 }
