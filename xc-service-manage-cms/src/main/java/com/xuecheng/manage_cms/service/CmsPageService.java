@@ -2,7 +2,9 @@ package com.xuecheng.manage_cms.service;
 
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
+import com.xuecheng.framework.domain.cms.response.CmsCode;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
@@ -79,20 +81,32 @@ public class CmsPageService {
         return new QueryResponseResult(CommonCode.SUCCESS, queryResult);
     }
 
-    //新增页面
+    ///新增页面
     public CmsPageResult add(CmsPage cmsPage) {
-        //校验页面是否存在，根据页面名称、站点Id、页面webpath查询
-        CmsPage cmsPage1 = cmsPageRepository.findBySiteIdAndPageNameAndPageWebPath(cmsPage.getPageName(), cmsPage.getSiteId(), cmsPage.getPageWebPath());
-        if (cmsPage1 == null) {
-            cmsPage.setPageId(null);//添加页面主键由spring data自动生成
-            CmsPage save = cmsPageRepository.save(cmsPage);
-            //返回结果
-            if (save != null) {
-                return new CmsPageResult(CommonCode.SUCCESS, save);
-            }
+        if(cmsPage == null){
+            //校验，抛出异常
+        }
+        //校验页面是否重复，根据页面名称、站点id、页面web访问路径判断此页面是否重复
+        //根据页面名称、站点id、页面web访问路径查询，如果查询到了说明页面已存在
+        CmsPage cmsPage_l = cmsPageRepository.findBySiteIdAndPageNameAndPageWebPath(cmsPage.getSiteId(),
+                cmsPage.getPageName(),
+                cmsPage.getPageWebPath());
+        if(cmsPage_l!=null){
+            //抛出具体的异常。。
+            ExceptionCast.cast(CmsCode.CMS_ADDPAGE_EXISTS);
+        }
+        //测试系统异常代码
+//        int i=1/0;
+        //将主键设置为空
+        cmsPage.setPageId(null);
+        CmsPage save = cmsPageRepository.save(cmsPage);
+        if(save!=null){
+            //返回成功
+            return new CmsPageResult(CommonCode.SUCCESS,save);
         }
         //返回失败
-        return new CmsPageResult(CommonCode.FAIL, null);
+        return new CmsPageResult(CommonCode.FAIL,null);
+
     }
 
     //根据id查询页面
