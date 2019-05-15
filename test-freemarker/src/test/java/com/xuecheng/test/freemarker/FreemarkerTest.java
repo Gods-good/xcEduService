@@ -1,0 +1,99 @@
+package com.xuecheng.test.freemarker;
+
+import freemarker.cache.StringTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * @Description
+ * @auther Jack
+ * @create 2019-05-14 18:29
+ */
+@SpringBootTest
+@RunWith(SpringRunner.class)
+public class FreemarkerTest {
+    //基于模板进行测试静态化
+    @Test
+    public void testGenerateHtmlByHtml() throws IOException, TemplateException {
+        //配置freemarker
+        Configuration configuration = new Configuration(Configuration.getVersion());
+        //模板内容
+        String templateContent="<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "    <meta charset=\"utf-8\">\n" +
+                "    <title>Hello World!</title>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "Hello ${name}!\n" +
+                "\n" +
+                "</body>\n" +
+                "</html>";
+        //加载模板
+        //使用模板加载器
+        StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
+        //加载上边templateContent的内容作为模板
+        //参数1：给模板起一个名称，参数2：模板内容
+        stringTemplateLoader.putTemplate("test2",templateContent);
+        //将模板加载器设置到configuration
+        configuration.setTemplateLoader(stringTemplateLoader);
+        //设置字符编码
+        configuration.setDefaultEncoding("utf-8");
+        //指定模板文件名
+        Template template = configuration.getTemplate("test2");
+        //准备数据
+        Map<String ,Object> map = new HashMap<>();
+        map.put("name","黑马程序员");
+        //静态化
+        //参数1
+        String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
+        System.out.println(content);
+        //将静态化内容输出到文件中
+        InputStream inputStream = IOUtils.toInputStream(content);
+        //输出流
+        FileOutputStream outputStream =new FileOutputStream("e:/FreemarkerTest/test2.html");
+        IOUtils.copy(inputStream,outputStream);
+    }
+    //基于模板进行测试静态化
+    @Test
+    public void testGenerateHtmlByTemplate() throws IOException, TemplateException {
+        //配置freemarker
+        Configuration configuration = new Configuration(Configuration.getVersion());
+        //加载模板
+        //得到classpath路径
+        String classpath = this.getClass().getResource("/").getPath();
+        //选指定模板路径
+        configuration.setDirectoryForTemplateLoading(new File(classpath+"/templates/"));
+        //设置字符编码
+        configuration.setDefaultEncoding("utf-8");
+        //指定模板文件名
+        Template template = configuration.getTemplate("test2.ftl");
+        //准备数据
+        Map<String ,Object> map = new HashMap<>();
+        map.put("name","黑马程序员");
+        //静态化
+        //参数1
+        String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
+        System.out.println(content);
+        //将静态化内容输出到文件中
+        InputStream inputStream = IOUtils.toInputStream(content);
+        //输出流
+        FileOutputStream outputStream =new FileOutputStream("e:/FreemarkerTest/test2.html");
+        IOUtils.copy(inputStream,outputStream);
+    }
+}
