@@ -3,6 +3,7 @@ package com.xuecheng.api.config.cms;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.cms.response.GenerateHtmlResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import io.swagger.annotations.Api;
@@ -12,7 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Created by mrt on 2018/6/23.
+ * Created by jack on 2019/4/30.
  */
 @Api(value="cms页面管理的接口",description="cms页面管理的接口，提供页面添加、删除、修改、查询操作")
 public interface CmsPageControllerApi {
@@ -45,4 +46,14 @@ public interface CmsPageControllerApi {
     @ApiOperation(value="删除页面")
     @DeleteMapping(API_PRE+"/del/{id}")
     public ResponseResult delete(@PathVariable("id") String id);
+
+    //生成静态化文件
+    @ApiOperation(value="生成静态化文件")
+    @PostMapping(API_PRE+"/generateHtml/{pageId}")
+    public GenerateHtmlResult generateHtml(@PathVariable("pageId") String pageId);
+
+    //查询静态页面
+    @ApiOperation(value="查询静态页面")
+    @GetMapping(API_PRE+"/getHtml/{pageId}")
+    public GenerateHtmlResult getHtml(@PathVariable("pageId") String pageId);
 }

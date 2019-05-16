@@ -4,6 +4,7 @@ import com.xuecheng.api.config.cms.CmsPageControllerApi;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.cms.response.GenerateHtmlResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_cms.service.CmsPageService;
@@ -33,7 +34,7 @@ public class CmsPageController implements CmsPageControllerApi {
 
     @Override
     public CmsPageResult findById(@PathVariable("id") String id) {
-        return cmsPageService.findByid(id);
+        return cmsPageService.getById(id);
     }
 
     @Override
@@ -44,5 +45,15 @@ public class CmsPageController implements CmsPageControllerApi {
     @Override
     public ResponseResult delete(@PathVariable("id") String id) {
         return cmsPageService.delete(id);
+    }
+
+    @Override
+    public GenerateHtmlResult generateHtml(@PathVariable("pageId")String pageId) {
+        return cmsPageService.generateHtml(pageId);
+    }
+
+    @Override
+    public GenerateHtmlResult getHtml(@PathVariable("pageId")String pageId) {
+        return cmsPageService.getHtml(pageId);
     }
 }
