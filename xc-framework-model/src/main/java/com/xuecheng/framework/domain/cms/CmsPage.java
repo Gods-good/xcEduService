@@ -34,7 +34,7 @@ public class CmsPage {
     private String pageWebPath;
     //参数
     private String pageParameter;
-    //物理路径
+    //物理路径,基于cmsSite中的根路径的一个路径
     private String pagePhysicalPath;
     //类型（静态/动态）
     private String pageType;
