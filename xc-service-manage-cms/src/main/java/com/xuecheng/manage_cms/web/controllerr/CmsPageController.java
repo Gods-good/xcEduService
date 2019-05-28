@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CmsPageController implements CmsPageControllerApi {
     @Autowired
     CmsPageService cmsPageService;
+
     @Override
     public QueryResponseResult<CmsPage> findList(@PathVariable("page") int page, @PathVariable("size") int size, QueryPageRequest queryPageRequest) {
         return cmsPageService.findList(page,size,queryPageRequest);
@@ -55,5 +56,10 @@ public class CmsPageController implements CmsPageControllerApi {
     @Override
     public GenerateHtmlResult getHtml(@PathVariable("pageId")String pageId) {
         return cmsPageService.getHtml(pageId);
+    }
+
+    @Override
+    public ResponseResult postPage(@PathVariable("pageId") String pageId) {
+        return cmsPageService.postpage(pageId);
     }
 }

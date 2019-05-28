@@ -2,6 +2,7 @@ package com.xuecheng.manage_cms_client.mq;
 
 import com.alibaba.fastjson.JSON;
 import com.mongodb.gridfs.GridFSDBFile;
+import com.rabbitmq.client.Channel;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.CmsSite;
 import com.xuecheng.manage_cms_client.dao.CmsPageRepository;
@@ -19,18 +20,18 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.nio.channels.Channel;
 import java.util.Map;
 
 /**
- * @Description
- * @auther Jack
- * @create 2019-05-22 16:39
- */
+ * @author Administrator
+ * @version 1.0
+ * @create 2018-06-30 9:14
+ **/
 @Component
 public class ConsumerPostPage {
 
-    private  static final Logger LOGGER = LoggerFactory.getLogger(ConsumerPostPage.class);
+    private static final  Logger LOGGER = LoggerFactory.getLogger(ConsumerPostPage.class);
+
     @Autowired
     GridFsTemplate gridFsTemplate;
     @Autowired
@@ -38,9 +39,9 @@ public class ConsumerPostPage {
     @Autowired
     CmsSiteRepository cmsSiteRepository;
 
-    //接收页面发布的消息,从配置文件中注入队列名称
-    @RabbitListener(queues = {"${xuecheng.mq.queue}"})
-    public void postPage(String msg, Message message, Channel channel){
+    //接收页面发布的消息,从配置中注入队列名称
+    @RabbitListener(queues={"${xuecheng.mq.queue}"})
+    public void postPage(String msg,Message message,Channel channel){
         //解析消息
         Map msgMap = null;
         try {
@@ -51,40 +52,47 @@ public class ConsumerPostPage {
         }
         //从消息中得到页面id
         String pageId = (String) msgMap.get("pageId");
-        if (StringUtils.isEmpty(pageId)){
+        if(StringUtils.isEmpty(pageId)){
             LOGGER.error("in message not exists pageid");
-            return;
+            return ;
         }
+
         //查询数据库得到页面信息
         CmsPage cmsPage = cmsPageRepository.findOne(pageId);
         //页面所属站点
         String siteId = cmsPage.getSiteId();
         CmsSite cmsSite = cmsSiteRepository.findOne(siteId);
+
         //从页面信息中得到静态文件id
         String htmlFileId = cmsPage.getHtmlFileId();
-        if (StringUtils.isEmpty(htmlFileId)){
+        if(StringUtils.isEmpty(htmlFileId)){
             LOGGER.error("page htmlfileId is null");
-            return;
+            return ;
         }
-        //查询GridFs
+
+        //查询GridFS
         GridFSDBFile gridFSDBFile = gridFsTemplate.findOne(Query.query(Criteria.where("_id").is(htmlFileId)));
         //文件输入流
         InputStream inputStream = gridFSDBFile.getInputStream();
         //文件输出流
         //得到文件输出路径
         String filePath = cmsSite.getSitePhysicalPath()+cmsPage.getPagePhysicalPath()+cmsPage.getPageName();
-        FileOutputStream OutputStream = null;
+        FileOutputStream outputStream = null;
         try {
-            OutputStream = new FileOutputStream(new File(filePath));
+            outputStream  = new FileOutputStream(new File(filePath));
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             LOGGER.error("page html file path Not Found:{}",filePath);
         }
+
         try {
-            IOUtils.copy(inputStream, OutputStream);
+            IOUtils.copy(inputStream,outputStream);
         } catch (IOException e) {
             e.printStackTrace();
             LOGGER.error("output page html error:{}",e.getMessage());
         }
+
+
     }
 }

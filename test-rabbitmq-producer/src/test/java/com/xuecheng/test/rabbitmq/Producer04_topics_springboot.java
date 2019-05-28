@@ -36,5 +36,17 @@ public class Producer04_topics_springboot {
         rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_TOPICS_INFORM,"inform.email.sms",message);
 //        System.out.println(message);
     }
-
+    //发送消息到mq
+    @Test
+    public void send_postpagemsg(){
+        //发送消息
+        //消息内容
+        String msg = "{\n" +
+                "\"pageId\":\"5cd3a57aa86f8f2d54e53948\"\n" +
+                "}";
+        //站点id就是routingKey
+        String routingkey = "5a751fab6abb5044e0d19ea1";
+        rabbitTemplate.convertAndSend("ex_cms_postpage",routingkey,msg);
+//        System.out.println(message);
+    }
 }

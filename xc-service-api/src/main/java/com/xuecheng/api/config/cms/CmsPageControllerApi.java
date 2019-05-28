@@ -56,4 +56,9 @@ public interface CmsPageControllerApi {
     @ApiOperation(value="查询静态页面")
     @GetMapping(API_PRE+"/getHtml/{pageId}")
     public GenerateHtmlResult getHtml(@PathVariable("pageId") String pageId);
+
+    //页面发布
+    @ApiOperation(value="页面发布")
+    @PostMapping(API_PRE+"/postPage/{pageId}")
+    public ResponseResult postPage(@PathVariable("pageId") String pageId);
 }
