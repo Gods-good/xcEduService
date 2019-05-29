@@ -1,4 +1,4 @@
-package com.xuecheng.api.config.cms;
+package com.xuecheng.api.cms;
 
 import com.xuecheng.framework.domain.cms.response.CmsConfigResult;
 import io.swagger.annotations.Api;

@@ -1,4 +1,4 @@
-package com.xuecheng.api.config.cms;
+package com.xuecheng.api.cms;
 
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
@@ -26,7 +26,7 @@ public interface CmsPageControllerApi {
 
     })
     @GetMapping(API_PRE+"/list/{page}/{size}")
-    public QueryResponseResult<CmsPage> findList(@PathVariable("page") int page,@PathVariable("size") int size,QueryPageRequest queryPageRequest);
+    public QueryResponseResult<CmsPage> findList(@PathVariable("page") int page, @PathVariable("size") int size, QueryPageRequest queryPageRequest);
 
     @ApiOperation(value="新增页面")
     @PostMapping(API_PRE+"/add")
@@ -40,7 +40,7 @@ public interface CmsPageControllerApi {
     //更新页面
     @ApiOperation(value="更新页面")
     @PutMapping(API_PRE+"/edit/{id}")
-    public CmsPageResult edit(@PathVariable("id") String id,@RequestBody CmsPage cmsPage);
+    public CmsPageResult edit(@PathVariable("id") String id, @RequestBody CmsPage cmsPage);
 
     //删除页面
     @ApiOperation(value="删除页面")

@@ -19,7 +19,7 @@ public class Swagger2Configuration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.xuecheng"))//扫描此包以及子包下的@RestController标记的类，生成模板。
+                .apis(RequestHandlerSelectors.basePackage("com.xuecheng"))//扫描此包以及子包下的@RestController标记的类，生成接口文档
                 .paths(PathSelectors.any())
                 .build();
     }
