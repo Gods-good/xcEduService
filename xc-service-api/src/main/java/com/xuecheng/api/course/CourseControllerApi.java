@@ -16,7 +16,7 @@ public interface CourseControllerApi {
 
     //分页查询课程列表
     @GetMapping(API_PRE+"/coursebase/list/{page}/{size}")
-    public QueryResponseResult<CourseInfo> findCourseList(@PathVariable("page") int page,
-                                                          @PathVariable("size") int size,
+    public QueryResponseResult<CourseInfo> findCourseList(@PathVariable("page")int page,
+                                                          @PathVariable("size")int size,
                                                           CourseListRequest courseListRequest);
 }

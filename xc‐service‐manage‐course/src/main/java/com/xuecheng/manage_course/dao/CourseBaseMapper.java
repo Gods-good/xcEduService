@@ -1,15 +1,17 @@
 package com.xuecheng.manage_course.dao;
 
+import com.github.pagehelper.Page;
 import com.xuecheng.framework.domain.course.CourseBase;
+import com.xuecheng.framework.domain.course.ext.CourseInfo;
+import com.xuecheng.framework.domain.course.request.CourseListRequest;
 import org.apache.ibatis.annotations.Mapper;
 
-
 /**
- * @Description
- * @auther Jack
- * @create 2019-05-28 17:22
+ * Created by mrt on 2018/6/30.
  */
 @Mapper
 public interface CourseBaseMapper {
-    CourseBase findCourseBaseById(String Id);
+    CourseBase findCourseBaseById(String id);
+    //分页查询课程列表
+    Page<CourseInfo> findCourseListPage(CourseListRequest courseListRequest);
 }
