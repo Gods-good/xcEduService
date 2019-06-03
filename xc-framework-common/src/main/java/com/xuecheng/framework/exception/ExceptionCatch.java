@@ -4,9 +4,12 @@ import com.google.common.collect.ImmutableMap;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.framework.model.response.ResultCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 /**
  * @Description
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @ControllerAdvice//控制器增强
 public class ExceptionCatch {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionCatch.class);
 
     //将不可预知的异常在map中配置异常所对应的错误代码及信息
     //ImmutableMap是不可变
@@ -26,6 +31,8 @@ public class ExceptionCatch {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseResult catchException(Exception e){
+        LOGGER.error("catch exception info{}",e.getMessage());
+        e.printStackTrace();
         if (EXCEPTIONS == null){
             //异常类型和错误代码的map构建成功
             EXCEPTIONS = builder.build();
@@ -44,6 +51,8 @@ public class ExceptionCatch {
     @ExceptionHandler(CustomException.class)
     @ResponseBody
     public ResponseResult customException(CustomException e){
+        LOGGER.error("catch exception info{}",e.getMessage());
+        e.printStackTrace();
         //处理异常
         ResultCode resultCode = e.getResultCode();
 
