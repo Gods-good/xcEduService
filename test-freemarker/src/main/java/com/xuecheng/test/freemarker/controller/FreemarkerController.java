@@ -20,6 +20,18 @@ public class FreemarkerController {
     @Autowired
     RestTemplate restTemplate;
 
+    //测试课程详情
+    @RequestMapping("/course")
+    public String course(Map<String,Object> map){
+        //取到模型数据
+        String dataUrl = "http://localhost:31200/course/courseview/4028e581617f945f01617f9dabc40000";
+        ResponseEntity<Map> forEntity = restTemplate.getForEntity(dataUrl, Map.class);
+        Map body = forEntity.getBody();
+        //设置到freemarker 数据模型中
+        map.put("model",body);
+        return "course";
+    }
+
     //测试banner模板
     @RequestMapping("/banner")
     public String banner(Map<String,Object> map){

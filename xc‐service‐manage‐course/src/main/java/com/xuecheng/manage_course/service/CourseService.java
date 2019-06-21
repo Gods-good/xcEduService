@@ -3,9 +3,12 @@ package com.xuecheng.manage_course.service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.course.CourseBase;
+import com.xuecheng.framework.domain.course.CourseMarket;
+import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CategoryNode;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
+import com.xuecheng.framework.domain.course.ext.CourseView;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.course.request.CourseListRequest;
 import com.xuecheng.framework.domain.course.response.AddCourseResult;
@@ -15,15 +18,12 @@ import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.framework.model.response.ResponseResult;
-import com.xuecheng.manage_course.dao.TeachplanRepository;
-import com.xuecheng.manage_course.dao.CategoryMapper;
-import com.xuecheng.manage_course.dao.CourseBaseMapper;
-import com.xuecheng.manage_course.dao.CourseBaseRepository;
-import com.xuecheng.manage_course.dao.TeachplanMapper;
+import com.xuecheng.manage_course.dao.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -38,6 +38,10 @@ public class CourseService {
     CourseBaseMapper courseBaseMapper;
     @Autowired
     CourseBaseRepository courseBaseRepository;
+    @Autowired
+    CourseMarketRepository courseMarketRepository;
+    @Autowired
+    CoursePicRepository coursePicRepository;
 
     @Autowired
     CategoryMapper categoryMapper;
@@ -189,5 +193,59 @@ public class CourseService {
         //向数据库保存课程计划
         Teachplan save = teachplanRepository.save(teachplan);
         return new ResponseResult(CommonCode.SUCCESS);
+    }
+
+    //保存课程图片到course_pic
+    @Transactional
+    public ResponseResult saveCoursePic(String courseId, String pic) {
+        CoursePic one = coursePicRepository.findOne(courseId);
+
+        if(one!=null){//保存图片
+            one.setPic(pic);
+            coursePicRepository.save(one);
+        }else{
+            CoursePic coursePic = new CoursePic();
+            coursePic.setCourseid(courseId);
+            coursePic.setPic(pic);
+            CoursePic save = coursePicRepository.save(coursePic);
+        }
+        return new ResponseResult(CommonCode.SUCCESS);
+    }
+
+    //根据课程id查询课程图片
+    public CoursePic findCoursepicList(String courseId) {
+        CoursePic coursePic = coursePicRepository.findOne(courseId);
+        return coursePic;
+    }
+    //删除课程图片
+    @Transactional
+    public ResponseResult deleteCoursePic(String courseId) {
+        //删除课程图片信息，如果成功返回值大于0
+        long result = coursePicRepository.deleteByCourseid(courseId);
+        if(result>0){
+            return new ResponseResult(CommonCode.SUCCESS);
+        }else{
+            return new ResponseResult(CommonCode.FAIL);
+        }
+
+    }
+    //根据课程id查询课程全部信息，此信息用于静态化
+    public CourseView getCoruseView(String courseId) {
+        CourseView courseView = new CourseView();
+        CourseBase courseBase = courseBaseRepository.findOne(courseId);
+        if (courseBase == null){
+            return courseView;
+        }
+        //图片
+        CoursePic coursePic = coursePicRepository.findOne(courseId);
+        //营销信息
+        CourseMarket courseMarket = courseMarketRepository.findOne(courseId);
+        //课程计划
+        TeachplanNode teachplanNode = teachplanMapper.selectList(courseId);
+        courseView.setCourseBase(courseBase);
+        courseView.setCourseMarket(courseMarket);
+        courseView.setCoursePic(coursePic);
+        courseView.setTeachplanNode(teachplanNode);
+        return courseView;
     }
 }

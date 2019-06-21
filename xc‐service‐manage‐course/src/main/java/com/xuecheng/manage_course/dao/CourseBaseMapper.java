@@ -6,9 +6,7 @@ import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.request.CourseListRequest;
 import org.apache.ibatis.annotations.Mapper;
 
-/**
- * Created by mrt on 2018/6/30.
- */
+
 @Mapper
 public interface CourseBaseMapper {
     CourseBase findCourseBaseById(String id);

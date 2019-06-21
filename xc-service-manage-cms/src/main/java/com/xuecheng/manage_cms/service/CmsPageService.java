@@ -8,6 +8,7 @@ import com.xuecheng.framework.domain.cms.CmsTemplate;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsCode;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.cms.response.CommonmethodsResult;
 import com.xuecheng.framework.domain.cms.response.GenerateHtmlResult;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
@@ -224,11 +225,41 @@ public class CmsPageService {
         return fileId;
     }
     /**
+     * 根据页面得到静态化内容
+     * @param pageId
+     * @return
+     */
+    public String getHtmlByPageId(String pageId){
+        CommonmethodsResult commonmethods = this.Commonmethods(pageId);
+        String content = commonmethods.getContent();
+        System.out.println(content);
+        return content;
+
+    }
+    /**
      * 生成静态化文件
      * @param pageId
      * @return
      */
     public GenerateHtmlResult generateHtml(String pageId){
+        CommonmethodsResult commonmethods = this.Commonmethods(pageId);
+        CmsPage one = commonmethods.getCmsPage();
+        String content = commonmethods.getContent();
+        System.out.println(content);
+
+        //保存静态文件内容到 GridFS
+        String fileId = this.saveHtml(content);
+
+
+        //将文件id存储到 cmspage
+        one.setHtmlFileId(fileId);
+        CmsPage save = cmsPageRepository.save(one);
+
+        return new GenerateHtmlResult(CommonCode.SUCCESS,content);
+
+    }
+    //抽出来的公有静态化方法
+    private CommonmethodsResult Commonmethods(String pageId){
         //查询页面信息
         CmsPage one = cmsPageRepository.findOne(pageId);
         if(one == null){
@@ -286,19 +317,13 @@ public class CmsPageService {
             e.printStackTrace();
             ExceptionCast.cast(CmsCode.CMS_GENERATEHTML_HTMLISNULL);
         }
-        System.out.println(content);
-
-        //保存静态文件内容到 GridFS
-        String fileId = this.saveHtml(content);
-
-
-        //将文件id存储到 cmspage
-        one.setHtmlFileId(fileId);
-        CmsPage save = cmsPageRepository.save(one);
-
-        return new GenerateHtmlResult(CommonCode.SUCCESS,content);
-
+        CommonmethodsResult result = new CommonmethodsResult();
+        result.setCmsPage(one);
+        result.setContent(content);
+        return result;
     }
+
+
 
     //查询静态页面内容
     public GenerateHtmlResult getHtml(String pageId){

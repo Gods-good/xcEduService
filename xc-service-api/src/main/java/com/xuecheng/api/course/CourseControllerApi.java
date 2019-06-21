@@ -1,18 +1,18 @@
 package com.xuecheng.api.course;
 
 import com.xuecheng.framework.domain.course.CourseBase;
+import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
+import com.xuecheng.framework.domain.course.ext.CourseView;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.course.request.CourseListRequest;
 import com.xuecheng.framework.domain.course.response.AddCourseResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by mrt on 2018/6/23.
@@ -38,4 +38,23 @@ public interface CourseControllerApi {
     //添加课程计划
     @PostMapping(API_PRE+"/teachplan/add")
     public ResponseResult addTeachplan(@RequestBody Teachplan teachplan);
+
+    //保存图片地址到course_pic
+    @PostMapping(API_PRE+"/coursepic/add")
+    @ApiOperation("添加课程图片")
+    public ResponseResult addCoursePic(@RequestParam("courseId")String courseId,@RequestParam("pic")String pic);
+
+    //根据课程id 查询图片
+    @GetMapping(API_PRE+"/coursepic/list/{courseId}")
+    @ApiOperation("获取课程图片")
+    public CoursePic findCoursePicList(@PathVariable("courseId") String courseId);
+
+    @DeleteMapping(API_PRE+"/coursepic/delete")
+    @ApiOperation("删除课程图片")
+    public ResponseResult deleteCoursePic(@RequestParam("courseId")String courseId);
+
+    //查询课程全部信息用于静态化
+    @ApiOperation("课程视图查询")
+    @GetMapping(API_PRE+"/courseview/{id}")
+    public CourseView courseview(@PathVariable("id") String id);
 }

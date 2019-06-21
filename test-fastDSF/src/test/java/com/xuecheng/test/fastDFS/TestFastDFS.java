@@ -67,7 +67,7 @@ public class TestFastDFS {
         byte[] bytes = storageClient1.download_file1("group1/M00/00/01/wKgAOFz5LHuAKsW7ABFoayGa4BU115.png");
 //        storageClient1.delete_file1()删除
 //        FileInfo fileInfo = storageClient1.query_file_info1(""); 查询
-        FileOutputStream outputStream  =new FileOutputStream(new File("d:/logo2.png"));
+        FileOutputStream outputStream  =new FileOutputStream(new File("d:/logo3.png"));
         outputStream.write(bytes);
         outputStream.close();
 

@@ -6,9 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/**
- * Created by mrt on 2018/6/30.
- */
+
 @RequestMapping("/category")
 @Api(value = "课程分类管理",description = "课程分类管理",tags = {"课程分类管理"})
 public interface CategoryControllerApi {
