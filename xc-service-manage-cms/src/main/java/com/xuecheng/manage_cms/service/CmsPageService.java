@@ -372,5 +372,22 @@ public class CmsPageService {
         return new ResponseResult(CommonCode.SUCCESS);
     }
 
+    //页面保存功能
+    public CmsPageResult save(CmsPage cmsPage) {
+        //校验页面是否重复，根据页面名称、站点id、页面web访问路径判断此页面是否重复
+        //根据页面名称、站点id、页面web访问路径查询，如果查询到了说明页面已存在
+        CmsPage cmsPage_l = cmsPageRepository.findBySiteIdAndPageNameAndPageWebPath(cmsPage.getSiteId(),
+                cmsPage.getPageName(),
+                cmsPage.getPageWebPath());
+        if(cmsPage_l == null){
+            //执行添加
+            CmsPageResult add = this.add(cmsPage);
+            return add;
+        }else{
+            //执行更新
+            CmsPageResult update = this.update(cmsPage_l.getPageId(), cmsPage);
+            return update;
+        }
 
+    }
 }

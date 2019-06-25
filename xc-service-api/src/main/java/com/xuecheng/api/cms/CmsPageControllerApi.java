@@ -32,6 +32,10 @@ public interface CmsPageControllerApi {
     @PostMapping(API_PRE+"/add")
     public CmsPageResult add(@RequestBody CmsPage cmsPage);
 
+    @ApiOperation(value="保存页面，不存在页面要添加，已存在要更新")
+    @PostMapping(API_PRE+"/save")
+    public CmsPageResult save(@RequestBody CmsPage cmsPage);
+
     //根据id查询页面
     @ApiOperation(value="根据id查询页面")
     @GetMapping(API_PRE+"/get/{id}")

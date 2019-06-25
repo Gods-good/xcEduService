@@ -2,6 +2,8 @@ package com.xuecheng.manage_course.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.xuecheng.framework.domain.cms.CmsPage;
+import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.domain.course.CourseBase;
 import com.xuecheng.framework.domain.course.CourseMarket;
 import com.xuecheng.framework.domain.course.CoursePic;
@@ -13,17 +15,21 @@ import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.course.request.CourseListRequest;
 import com.xuecheng.framework.domain.course.response.AddCourseResult;
 import com.xuecheng.framework.domain.course.response.CourseCode;
+import com.xuecheng.framework.domain.course.response.CoursePublishResult;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.framework.model.response.ResponseResult;
+import com.xuecheng.manage_course.client.CmsPageClient;
 import com.xuecheng.manage_course.dao.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,8 +44,7 @@ public class CourseService {
     CourseBaseMapper courseBaseMapper;
     @Autowired
     CourseBaseRepository courseBaseRepository;
-    @Autowired
-    CourseMarketRepository courseMarketRepository;
+
     @Autowired
     CoursePicRepository coursePicRepository;
 
@@ -50,6 +55,24 @@ public class CourseService {
 
     @Autowired
     TeachplanRepository teachplanRepository;
+    @Autowired
+    CourseMarketRepository courseMarketRepository;
+
+    @Autowired
+    CmsPageClient cmsPageClient;
+
+    @Value("${course-publish.dataUrlPre}")
+    private String publish_dataUrlPre;
+    @Value("${course-publish.pagePhysicalPath}")
+    private String publish_page_physicalpath;
+    @Value("${course-publish.pageWebPath}")
+    private String publish_page_webpath;
+    @Value("${course-publish.siteId}")
+    private String publish_siteId;
+    @Value("${course-publish.templateId}")
+    private String publish_templateId;
+    @Value("${course-publish.previewUrl}")
+    private String previewUrl;
 
     //查询课程列表
     public QueryResponseResult<CourseInfo> findCourseList(int page,int size,CourseListRequest courseListRequest){
@@ -229,23 +252,67 @@ public class CourseService {
         }
 
     }
+
     //根据课程id查询课程全部信息，此信息用于静态化
-    public CourseView getCoruseView(String courseId) {
+    public CourseView getCoruseView(String id) {
         CourseView courseView = new CourseView();
-        CourseBase courseBase = courseBaseRepository.findOne(courseId);
-        if (courseBase == null){
+        CourseBase courseBase = courseBaseRepository.findOne(id);
+        if(courseBase == null){
             return courseView;
         }
         //图片
-        CoursePic coursePic = coursePicRepository.findOne(courseId);
+        CoursePic coursePic = coursePicRepository.findOne(id);
         //营销信息
-        CourseMarket courseMarket = courseMarketRepository.findOne(courseId);
+        CourseMarket courseMarket = courseMarketRepository.findOne(id);
         //课程计划
-        TeachplanNode teachplanNode = teachplanMapper.selectList(courseId);
+        TeachplanNode teachplanNode = teachplanMapper.selectList(id);
         courseView.setCourseBase(courseBase);
         courseView.setCourseMarket(courseMarket);
         courseView.setCoursePic(coursePic);
         courseView.setTeachplanNode(teachplanNode);
         return courseView;
+
+
+    }
+
+    //课程预览
+
+    /**
+     * 业务流程
+     * 1、前端请求课程预览
+     * 2/此方法请求cms服务添加页面
+     * 3/得到cms服务返回添加成功的页面id
+     * 4、此方法根据页面id拼接成http://www.xuecheng.com/cms/preview/5b3469f794db44269cb2bff1地址
+     * 5、将此页面预览的地址给前端返回
+     * 6/前端在浏览器打开此页面预览地址
+     * @param id
+     * @return
+     */
+    public CoursePublishResult preview(String id) {
+        CourseBase one = courseBaseRepository.findOne(id);
+        //请求cms添加课程页面
+        CmsPage cmsPage = new CmsPage();
+        cmsPage.setSiteId(publish_siteId);
+        cmsPage.setPageName(id+".html");//页面详情页面的名称为 "课程id.html"
+        cmsPage.setPagePhysicalPath(publish_page_physicalpath);
+        cmsPage.setPageWebPath(publish_page_webpath);
+        cmsPage.setPageAliase(one.getName());//页面别名就是课程名称
+        cmsPage.setDataUrl(publish_dataUrlPre+id);
+        cmsPage.setTemplateId(publish_templateId);
+        cmsPage.setPageCreateTime(new Date());
+        //远程调用cms
+        CmsPageResult cmsPageResult = cmsPageClient.save(cmsPage);
+        if(!cmsPageResult.isSuccess()){
+            //抛出异常
+            ExceptionCast.cast(CourseCode.COURSE_PUBLISH_CDETAILERROR);
+        }
+        //获取新页面的id
+        CmsPage cmsPage1 = cmsPageResult.getCmsPage();
+        String pageId = cmsPage1.getPageId();
+        //构建一个页面预览的url
+        String url = previewUrl+pageId;
+        return new CoursePublishResult(CommonCode.SUCCESS,url);
+
+
     }
 }

@@ -16,22 +16,25 @@ import java.io.IOException;
  * @create 2019-06-21 18:47
  */
 @Controller
-public class CmsPagePreviewController extends BaseController {
+public class CmsPagePreviewController extends BaseController{
     @Autowired
     CmsPageService cmsPageService;
+
     //接收到页面id
     @RequestMapping("/cms/preview/{pageId}")
-    public void  preview(@PathVariable("pageId")String pageid){
-        //调用service歌迷页面得到静态化内容
-        String content = cmsPageService.getHtmlByPageId(pageid);
-        //使用response将静态化内容和响应到浏览器
+    public void preview(@PathVariable("pageId")String pageId){
+
+        //调用service根据页面得到静态化内容
+        String content = cmsPageService.getHtmlByPageId(pageId);
+
+        //使用response将静态化内容响应到浏览器
         ServletOutputStream outputStream = null;
         try {
-             outputStream = response.getOutputStream();
+            outputStream  = response.getOutputStream();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        response.setHeader("Content-type","test/html;charset=utf-8");
+        response.setHeader("Content-type","text/html;charset=utf-8");
         //输出静态化内容
         try {
             outputStream.write(content.getBytes("utf-8"));
@@ -39,4 +42,6 @@ public class CmsPagePreviewController extends BaseController {
             e.printStackTrace();
         }
     }
+
+
 }

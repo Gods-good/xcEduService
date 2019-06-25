@@ -34,6 +34,11 @@ public class CmsPageController implements CmsPageControllerApi {
     }
 
     @Override
+    public CmsPageResult save(@RequestBody CmsPage cmsPage) {
+        return cmsPageService.save(cmsPage);
+    }
+
+    @Override
     public CmsPageResult findById(@PathVariable("id") String id) {
         return cmsPageService.getById(id);
     }
