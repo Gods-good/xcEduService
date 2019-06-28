@@ -4,12 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSFile;
 import com.xuecheng.framework.domain.cms.CmsPage;
+import com.xuecheng.framework.domain.cms.CmsSite;
 import com.xuecheng.framework.domain.cms.CmsTemplate;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
-import com.xuecheng.framework.domain.cms.response.CmsCode;
-import com.xuecheng.framework.domain.cms.response.CmsPageResult;
-import com.xuecheng.framework.domain.cms.response.CommonmethodsResult;
-import com.xuecheng.framework.domain.cms.response.GenerateHtmlResult;
+import com.xuecheng.framework.domain.cms.response.*;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
@@ -17,6 +15,7 @@ import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_cms.config.RabbitMQConfig;
 import com.xuecheng.manage_cms.dao.CmsPageRepository;
+import com.xuecheng.manage_cms.dao.CmsSiteRepository;
 import com.xuecheng.manage_cms.dao.CmsTemplateRepository;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
@@ -66,6 +65,9 @@ public class CmsPageService {
 
     @Autowired
     RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    CmsSiteRepository cmsSiteRepository;
 
     //分页查询cmspage
     public QueryResponseResult findList(int page, int size, QueryPageRequest queryPageRequest) {
@@ -230,7 +232,7 @@ public class CmsPageService {
      * @return
      */
     public String getHtmlByPageId(String pageId){
-        CommonmethodsResult commonmethods = this.Commonmethods(pageId);
+        CmsmethodsResult commonmethods = this.baseCms(pageId);
         String content = commonmethods.getContent();
         System.out.println(content);
         return content;
@@ -242,7 +244,7 @@ public class CmsPageService {
      * @return
      */
     public GenerateHtmlResult generateHtml(String pageId){
-        CommonmethodsResult commonmethods = this.Commonmethods(pageId);
+        CmsmethodsResult commonmethods = this.baseCms(pageId);
         CmsPage one = commonmethods.getCmsPage();
         String content = commonmethods.getContent();
         System.out.println(content);
@@ -259,7 +261,7 @@ public class CmsPageService {
 
     }
     //抽出来的公有静态化方法
-    private CommonmethodsResult Commonmethods(String pageId){
+    private CmsmethodsResult baseCms(String pageId){
         //查询页面信息
         CmsPage one = cmsPageRepository.findOne(pageId);
         if(one == null){
@@ -317,7 +319,7 @@ public class CmsPageService {
             e.printStackTrace();
             ExceptionCast.cast(CmsCode.CMS_GENERATEHTML_HTMLISNULL);
         }
-        CommonmethodsResult result = new CommonmethodsResult();
+        CmsmethodsResult result = new CmsmethodsResult();
         result.setCmsPage(one);
         result.setContent(content);
         return result;
@@ -389,5 +391,36 @@ public class CmsPageService {
             return update;
         }
 
+    }
+    //一键发布页面
+    public CmsPostPageResult postPageQuick(CmsPage cmsPage) {
+        //保存页面
+        CmsPageResult cmsPageResult = this.save(cmsPage);
+        if (!cmsPageResult.isSuccess()){
+            return new CmsPostPageResult(CommonCode.FAIL,null);
+        }
+        CmsPage cmsPage1 = cmsPageResult.getCmsPage();
+        //新添加页面的id
+        String pageId = cmsPage1.getPageId();
+        //发布页面
+        ResponseResult responseResult = this.postpage(pageId);
+        if (!responseResult.isSuccess()){
+            return new CmsPostPageResult(CommonCode.FAIL,null);
+        }
+        //发布成功，最终给调用方返回url
+        //页面Url= cmsSite.siteDomain+cmsSite.siteWebPath+ cmsPage.pageWebPath + cmsPage.pageName
+
+        //页面所属站点id
+        String siteId = cmsPage1.getSiteId();
+        CmsSite cmsSite = cmsSiteRepository.findOne(siteId);
+        String siteDomain = cmsSite.getSiteDomain();//站点域名
+        String siteWebPath = cmsSite.getSiteWebPath();//站点根路径
+
+        String pageWebPath = cmsPage1.getPageWebPath();//页面路径
+        String pageName = cmsPage1.getPageName();//页面名称
+
+        //页面url
+        String pageUrl = siteDomain+siteWebPath+pageWebPath+pageName;
+        return new CmsPostPageResult(CommonCode.SUCCESS,pageUrl);
     }
 }

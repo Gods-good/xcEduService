@@ -3,6 +3,7 @@ package com.xuecheng.api.cms;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.cms.response.CmsPostPageResult;
 import com.xuecheng.framework.domain.cms.response.GenerateHtmlResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.ResponseResult;
@@ -65,4 +66,8 @@ public interface CmsPageControllerApi {
     @ApiOperation(value="页面发布")
     @PostMapping(API_PRE+"/postPage/{pageId}")
     public ResponseResult postPage(@PathVariable("pageId") String pageId);
+
+    @ApiOperation(value="一键页面发布")
+    @PostMapping(API_PRE+"/postPageQuick")
+    public CmsPostPageResult postPageQuick(@RequestBody CmsPage cmsPage);
 }

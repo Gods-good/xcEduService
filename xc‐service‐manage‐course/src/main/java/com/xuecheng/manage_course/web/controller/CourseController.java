@@ -19,11 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @author Administrator
- * @version 1.0
- * @create 2018-06-30 11:51
- **/
+
 @RestController
 public class CourseController implements CourseControllerApi {
     @Autowired
@@ -71,6 +67,11 @@ public class CourseController implements CourseControllerApi {
     @Override
     public CoursePublishResult preview(@PathVariable("id")String id) {
         return courseService.preview(id);
+    }
+
+    @Override
+    public CoursePublishResult publish(@PathVariable("id")String id) {
+        return courseService.publish(id);
     }
 
 

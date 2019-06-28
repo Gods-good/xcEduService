@@ -9,15 +9,15 @@ import lombok.Data;
  * @create 2019-06-21 19:18
  */
 @Data
-public class CommonmethodsResult {
+public class CmsmethodsResult {
     String content;
     CmsPage cmsPage;
 
-    public CommonmethodsResult(String content, CmsPage cmsPage) {
+    public CmsmethodsResult(String content, CmsPage cmsPage) {
         this.content = content;
         this.cmsPage = cmsPage;
     }
 
-    public CommonmethodsResult() {
+    public CmsmethodsResult() {
     }
 }

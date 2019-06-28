@@ -27,7 +27,6 @@ public interface CourseControllerApi {
     public QueryResponseResult<CourseInfo> findCourseList(@PathVariable("page")int page,
                                                           @PathVariable("size")int size,
                                                           CourseListRequest courseListRequest);
-
     //新增课程
     @PostMapping(API_PRE+"/coursebase/add")
     public AddCourseResult addCourseBase(@RequestBody CourseBase courseBase);
@@ -63,4 +62,7 @@ public interface CourseControllerApi {
     @ApiOperation("预览课程")
     public CoursePublishResult preview(@PathVariable("id") String id);
 
+    @PostMapping(API_PRE+"/publish/{id}")
+    @ApiOperation("发布课程")
+    public CoursePublishResult publish(@PathVariable("id") String id);
 }
