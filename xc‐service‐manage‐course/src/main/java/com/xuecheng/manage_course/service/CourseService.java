@@ -1,14 +1,11 @@
 package com.xuecheng.manage_course.service;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
-import com.xuecheng.framework.domain.cms.response.CmsPostPageResult;
-import com.xuecheng.framework.domain.course.CourseBase;
-import com.xuecheng.framework.domain.course.CourseMarket;
-import com.xuecheng.framework.domain.course.CoursePic;
-import com.xuecheng.framework.domain.course.Teachplan;
+import com.xuecheng.framework.domain.course.*;
 import com.xuecheng.framework.domain.course.ext.CategoryNode;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.ext.CourseView;
@@ -25,19 +22,17 @@ import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_course.client.CmsPageClient;
 import com.xuecheng.manage_course.dao.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author Administrator
- * @version 1.0
- * @create 2018-06-30 11:47
- **/
+
 @Service
 public class CourseService {
 
@@ -58,6 +53,9 @@ public class CourseService {
     TeachplanRepository teachplanRepository;
     @Autowired
     CourseMarketRepository courseMarketRepository;
+
+    @Autowired
+    CoursePubRepository coursePubRepository;
 
     @Autowired
     CmsPageClient cmsPageClient;
@@ -290,7 +288,17 @@ public class CourseService {
      * @return
      */
     public CoursePublishResult preview(String id) {
-        CmsPage cmsPage = this.baseCourse(id);
+        CourseBase one = courseBaseRepository.findOne(id);
+        //请求cms添加课程页面
+        CmsPage cmsPage = new CmsPage();
+        cmsPage.setSiteId(publish_siteId);
+        cmsPage.setPageName(id+".html");//页面详情页面的名称为 "课程id.html"
+        cmsPage.setPagePhysicalPath(publish_page_physicalpath);
+        cmsPage.setPageWebPath(publish_page_webpath);
+        cmsPage.setPageAliase(one.getName());//页面别名就是课程名称
+        cmsPage.setDataUrl(publish_dataUrlPre+id);
+        cmsPage.setTemplateId(publish_templateId);
+        cmsPage.setPageCreateTime(new Date());
         //远程调用cms
         CmsPageResult cmsPageResult = cmsPageClient.save(cmsPage);
         if(!cmsPageResult.isSuccess()){
@@ -306,29 +314,15 @@ public class CourseService {
 
 
     }
-    //页面发布
+
+
+    //课程发布
     @Transactional
     public CoursePublishResult publish(String id) {
         CourseBase courseBase = courseBaseRepository.findOne(id);
-        CmsPage cmsPage = this.baseCourse(id);
-        //调用cms的一键发布页面的接口
-        CmsPostPageResult cmsPostPageResult = cmsPageClient.postPageQuick(cmsPage);
-        if (!cmsPostPageResult.isSuccess()){
-            //抛出异常
-            ExceptionCast.cast(CourseCode.COURSE_PUBLISH_VIEWERROR);
-        }
-        //页面url
-        String pageUrl = cmsPostPageResult.getPageUrl();
-        //更新课程状态,从数据字典找发布的状态
-        courseBase.setStatus("202002");
-        CourseBase save = courseBaseRepository.save(courseBase);
-        return new CoursePublishResult(CommonCode.SUCCESS,pageUrl);
-    }
 
-    private CmsPage baseCourse(String id) {
-        CourseBase courseBase = courseBaseRepository.findOne(id);
         //准备页面信息
-        CmsPage cmsPage = new CmsPage();
+       /* CmsPage cmsPage = new CmsPage();
         cmsPage.setSiteId(publish_siteId);
         cmsPage.setPageName(id+".html");//页面详情页面的名称为 "课程id.html"
         cmsPage.setPagePhysicalPath(publish_page_physicalpath);
@@ -336,7 +330,85 @@ public class CourseService {
         cmsPage.setPageAliase(courseBase.getName());//页面别名就是课程名称
         cmsPage.setDataUrl(publish_dataUrlPre+id);
         cmsPage.setTemplateId(publish_templateId);
-        cmsPage.setPageCreateTime(new Date());
-        return cmsPage;
+        cmsPage.setPageCreateTime(new Date());*/
+        //调用 cms的一键发布页面的接口
+        /*CmsPostPageResult cmsPostPageResult = cmsPageClient.postPageQuick(cmsPage);
+        if(!cmsPostPageResult.isSuccess()){
+            ExceptionCast.cast(CourseCode.COURSE_PUBLISH_VIEWERROR);
+        }*/
+        //页面url
+//        String pageUrl = cmsPostPageResult.getPageUrl();
+        //更新课程状态,从数据字典中找课程发布状态
+        courseBase.setStatus("202002");
+        CourseBase save = courseBaseRepository.save(courseBase);
+
+        //将课程信息写到course_pub待索引表中，和更新课程状态属于一个事务。
+        CoursePub coursePub = this.saveCoursePub(id);
+        if(coursePub == null){
+            ExceptionCast.cast(CommonCode.FAIL);
+        }
+
+        return new CoursePublishResult(CommonCode.SUCCESS,"");
     }
+
+    //向course_pub保存课程信息
+    private CoursePub saveCoursePub(String courseId){
+
+        //从数据库查询的对象
+        CoursePub one = coursePubRepository.findOne(courseId);
+        //创建coursePub对象
+        CoursePub coursePub = createCoursePub(courseId);
+        if(one == null){
+            CoursePub save = coursePubRepository.save(coursePub);
+            return save;
+        }else{
+            //将创建的新coursePub对象的值拷贝到one中
+            BeanUtils.copyProperties(coursePub,one);
+            //设置主键
+            one.setId(courseId);
+            //设置时间戳
+            one.setTimestamp(new Date());
+            CoursePub save = coursePubRepository.save(one);
+            return save;
+        }
+
+    }
+
+    //创建course_pub对象
+    private CoursePub createCoursePub(String courseId){
+        CoursePub coursePub = new CoursePub();
+        //查询课程信息的各各表，组成一个coursePub对象
+        CourseBase courseBase = courseBaseRepository.findOne(courseId);
+        //将courseBase中属性拷贝到coursePub中
+        //参数：原对象，目标对象，两者不为空
+        BeanUtils.copyProperties(courseBase,coursePub);
+        //copyProperties相当于 coursePub.setName(courseBase.getName());....
+
+        //拼接营销信息
+        CourseMarket courseMarket = courseMarketRepository.findOne(courseId);
+        if(courseMarket!=null){
+            BeanUtils.copyProperties(courseMarket,coursePub);
+        }
+        //图片信息
+        CoursePic coursePic = coursePicRepository.findOne(courseId);
+        if(coursePic!=null){
+            BeanUtils.copyProperties(coursePic,coursePub);
+        }
+
+        //课程计划信息
+        TeachplanNode teachplanNode = teachplanMapper.selectList(courseId);
+        //将课程计划转成json存储到coursePub中
+        String teachplanNodeString = JSON.toJSONString(teachplanNode);
+        coursePub.setTeachplan(teachplanNodeString);
+
+        //指定课程发布时间
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String pubTime = simpleDateFormat.format(new Date());
+        coursePub.setPubTime(pubTime);
+        //时间戳,logstash根据此字段时间值决定是否索引
+        coursePub.setTimestamp(new Date());
+
+        return coursePub;
+    }
+
 }
