@@ -7,11 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @author Administrator
- * @version 1.0
- * @create 2018-06-23 12:18
- **/
+
 @RestController
 public class CmsConfigController implements CmsConfigControllerApi {
     @Autowired
