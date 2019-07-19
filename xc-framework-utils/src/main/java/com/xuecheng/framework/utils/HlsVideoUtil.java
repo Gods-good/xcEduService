@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class HlsVideoUtil extends  VideoUtil {
 
-    String ffmpeg_path = "D:\\Program Files\\ffmpeg-20180227-fa0c9d6-win64-static\\bin\\ffmpeg.exe";//ffmpeg的安装位置
+    String ffmpeg_path = "E:\\ffmpeg-20180227-fa0c9d6-win64-static\\bin\\ffmpeg.exe";//ffmpeg的安装位置
     String video_path = "D:\\BaiduNetdiskDownload\\test1.avi";
     String m3u8_name = "test1.m3u8";
     String m3u8folder_path = "D:/BaiduNetdiskDownload/Movies/test1/";
@@ -80,11 +80,7 @@ public class HlsVideoUtil extends  VideoUtil {
             ex.printStackTrace();
 
         }
-        //通过查看视频时长判断是否成功
-        Boolean check_video_time = check_video_time(video_path, m3u8folder_path + m3u8_name);
-        if(!check_video_time){
-            return outstring;
-        }
+
         //通过查看m3u8列表判断是否成功
         List<String> ts_list = get_ts_list();
         if(ts_list == null){
@@ -142,7 +138,7 @@ public class HlsVideoUtil extends  VideoUtil {
 
 
     public static void main(String[] args) throws IOException {
-        String ffmpeg_path = "D:\\Program Files\\ffmpeg-20180227-fa0c9d6-win64-static\\bin\\ffmpeg.exe";//ffmpeg的安装位置
+        String ffmpeg_path = "E:\\ffmpeg-20180227-fa0c9d6-win64-static\\bin\\ffmpeg.exe";//ffmpeg的安装位置
         String video_path = "E:\\ffmpeg_test\\1.mp4";
         String m3u8_name = "1.m3u8";
         String m3u8_path = "E:\\ffmpeg_test\\1\\";

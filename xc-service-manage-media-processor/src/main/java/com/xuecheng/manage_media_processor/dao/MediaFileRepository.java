@@ -1,4 +1,4 @@
-package com.xuecheng.manage_media.dao;
+package com.xuecheng.manage_media_processor.dao;
 
 import com.xuecheng.framework.domain.media.MediaFile;
 import org.springframework.data.mongodb.repository.MongoRepository;

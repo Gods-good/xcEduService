@@ -78,7 +78,7 @@ public class CmsPageService {
         if (page <= 0) {
             page = 1;
         }
-        page = page - 1;//为了适应mongodb的接口
+        page = page - 1;//page从0开始,为了适应mongodb的接口
         if (size <= 0) {
             size = 20;
         }
