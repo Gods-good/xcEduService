@@ -20,6 +20,7 @@
         <module name="xc-service-manage-media-processor" />
         <module name="xc-service-search" />
         <module name="xc‐service‐base‐filesystem" />
+        <module name="xc‐service‐learning" />
         <module name="xc‐service‐manage‐cms‐client" />
         <module name="xc‐service‐manage‐course" />
       </profile>
@@ -39,7 +40,9 @@
       <module name="xc-service-manage-media" target="1.8" />
       <module name="xc-service-manage-media-processor" target="1.8" />
       <module name="xc-service-search" target="1.8" />
+      <module name="xc-service-ucenter-auth" target="1.8" />
       <module name="xc‐service‐base‐filesystem" target="1.8" />
+      <module name="xc‐service‐learning" target="1.8" />
       <module name="xc‐service‐manage‐cms‐client" target="1.8" />
       <module name="xc‐service‐manage‐course" target="1.8" />
     </bytecodeTargetLevel>

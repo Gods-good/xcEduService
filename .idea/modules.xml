@@ -18,6 +18,7 @@
       <module fileurl="file://$PROJECT_DIR$/xc-service-search/xc-service-search.iml" filepath="$PROJECT_DIR$/xc-service-search/xc-service-search.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/xcEduService.iml" filepath="$PROJECT_DIR$/.idea/xcEduService.iml" />
       <module fileurl="file://$PROJECT_DIR$/xc‐service‐base‐filesystem/xc‐service‐base‐filesystem.iml" filepath="$PROJECT_DIR$/xc‐service‐base‐filesystem/xc‐service‐base‐filesystem.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xc‐service‐learning/xc‐service‐learning.iml" filepath="$PROJECT_DIR$/xc‐service‐learning/xc‐service‐learning.iml" />
       <module fileurl="file://$PROJECT_DIR$/xc‐service‐manage‐cms‐client/xc‐service‐manage‐cms‐client.iml" filepath="$PROJECT_DIR$/xc‐service‐manage‐cms‐client/xc‐service‐manage‐cms‐client.iml" />
       <module fileurl="file://$PROJECT_DIR$/xc‐service‐manage‐course/xc‐service‐manage‐course.iml" filepath="$PROJECT_DIR$/xc‐service‐manage‐course/xc‐service‐manage‐course.iml" />
     </modules>

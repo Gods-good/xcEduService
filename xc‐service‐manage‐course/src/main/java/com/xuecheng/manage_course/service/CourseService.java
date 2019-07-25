@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -59,7 +60,10 @@ public class CourseService {
 
     @Autowired
     CmsPageClient cmsPageClient;
-
+    @Autowired
+    TeachplanMediaRepository teachplanMediaRepository;
+    @Autowired
+    TeachplanMediaPubRepository teachplanMediaPubRepository;
     @Value("${course-publish.dataUrlPre}")
     private String publish_dataUrlPre;
     @Value("${course-publish.pagePhysicalPath}")
@@ -322,21 +326,21 @@ public class CourseService {
         CourseBase courseBase = courseBaseRepository.findOne(id);
 
         //准备页面信息
-       /* CmsPage cmsPage = new CmsPage();
-        cmsPage.setSiteId(publish_siteId);
-        cmsPage.setPageName(id+".html");//页面详情页面的名称为 "课程id.html"
-        cmsPage.setPagePhysicalPath(publish_page_physicalpath);
-        cmsPage.setPageWebPath(publish_page_webpath);
-        cmsPage.setPageAliase(courseBase.getName());//页面别名就是课程名称
-        cmsPage.setDataUrl(publish_dataUrlPre+id);
-        cmsPage.setTemplateId(publish_templateId);
-        cmsPage.setPageCreateTime(new Date());*/
-        //调用 cms的一键发布页面的接口
-        /*CmsPostPageResult cmsPostPageResult = cmsPageClient.postPageQuick(cmsPage);
-        if(!cmsPostPageResult.isSuccess()){
-            ExceptionCast.cast(CourseCode.COURSE_PUBLISH_VIEWERROR);
-        }*/
-        //页面url
+//        CmsPage cmsPage = new CmsPage();
+//        cmsPage.setSiteId(publish_siteId);
+//        cmsPage.setPageName(id+".html");//页面详情页面的名称为 "课程id.html"
+//        cmsPage.setPagePhysicalPath(publish_page_physicalpath);
+//        cmsPage.setPageWebPath(publish_page_webpath);
+//        cmsPage.setPageAliase(courseBase.getName());//页面别名就是课程名称
+//        cmsPage.setDataUrl(publish_dataUrlPre+id);
+//        cmsPage.setTemplateId(publish_templateId);
+//        cmsPage.setPageCreateTime(new Date());
+//        //调用 cms的一键发布页面的接口
+//        CmsPostPageResult cmsPostPageResult = cmsPageClient.postPageQuick(cmsPage);
+//        if(!cmsPostPageResult.isSuccess()){
+//            ExceptionCast.cast(CourseCode.COURSE_PUBLISH_VIEWERROR);
+//        }
+//        //页面url
 //        String pageUrl = cmsPostPageResult.getPageUrl();
         //更新课程状态,从数据字典中找课程发布状态
         courseBase.setStatus("202002");
@@ -347,8 +351,32 @@ public class CourseService {
         if(coursePub == null){
             ExceptionCast.cast(CommonCode.FAIL);
         }
-
+        //将课程计划的媒资信息存储到teachplan_media_pub，将来由logstash采用此表的数据
+        saveTeachplanMedia(id);
         return new CoursePublishResult(CommonCode.SUCCESS,"");
+    }
+    //保存teachplan_media_pub信息
+    private void saveTeachplanMedia(String courseId) {
+        //由于根据课程id查询课程计划记录数是多个，所以准备采用先根据课程id删除teachplan_media_pub,再根据课程id查询teachplan_media，将查询到的记录添加到teachplan_media_pub
+        //先根据课程id删除teachplanMediaPub
+        teachplanMediaPubRepository.deleteByCourseId(courseId);
+        //再从teachplan_media查询
+        List<TeachplanMedia> teachplanMedias = teachplanMediaRepository.findByCourseId(courseId);
+
+        //定义list，最将将此list添加到TeachplanMediaPub表中
+        List<TeachplanMediaPub> teachplanMediaPubList = new ArrayList<>();
+        for(TeachplanMedia teachplanMedia:teachplanMedias){
+            TeachplanMediaPub teachplanMediaPub = new TeachplanMediaPub();
+            //将teachplanMedia数据拷贝到teachplanMediaPub
+            BeanUtils.copyProperties(teachplanMedia,teachplanMediaPub);
+            //存储时间戳
+            teachplanMediaPub.setTimestamp(new Date());
+            //加入list
+            teachplanMediaPubList.add(teachplanMediaPub);
+
+        }
+        //向teachplanMediaPub添加数据
+        teachplanMediaPubRepository.save(teachplanMediaPubList);
     }
 
     //向course_pub保存课程信息
@@ -410,5 +438,34 @@ public class CourseService {
 
         return coursePub;
     }
+    //保存课程计划相关联的视频
+    @Transactional
+    public ResponseResult savemedia(TeachplanMedia teachplanMedia) {
 
+        if(teachplanMedia == null || StringUtils.isEmpty(teachplanMedia.getTeachplanId())){
+            ExceptionCast.cast(CommonCode.INVLIDATE);
+        }
+
+        //课程计划
+        String teachplanId = teachplanMedia.getTeachplanId();
+        TeachplanMedia teachplanMedia_save = teachplanMediaRepository.findOne(teachplanId);
+        if(teachplanMedia_save == null){
+            teachplanMedia_save = new TeachplanMedia();
+        }
+        //校验只允许在第3级选择视频
+        Teachplan teachplan = teachplanRepository.findOne(teachplanId);
+        //获取层级
+        String grade = teachplan.getGrade();
+        if(!grade.equals("3")){
+            ExceptionCast.cast(CourseCode.COURSE_MEDIS_GRADEERROR);
+        }
+        teachplanMedia_save.setMediaUrl(teachplanMedia.getMediaUrl());
+        teachplanMedia_save.setMediaId(teachplanMedia.getMediaId());
+        teachplanMedia_save.setMediaFileOriginalName(teachplanMedia.getMediaFileOriginalName());
+        teachplanMedia_save.setTeachplanId(teachplanMedia.getTeachplanId());
+        teachplanMedia_save.setCourseId(teachplanMedia.getCourseId());
+        teachplanMediaRepository.save(teachplanMedia_save);
+        return new ResponseResult(CommonCode.SUCCESS);
+
+    }
 }

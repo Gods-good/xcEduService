@@ -1,4 +1,4 @@
-package com.xuecheng.manage_course;
+package com.xuecheng.learning;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,16 +15,19 @@ import org.springframework.web.client.RestTemplate;
 @EnableDiscoveryClient
 @EnableFeignClients
 @SpringBootApplication
-@EntityScan("com.xuecheng.framework.domain.course")//扫描实体类
+@EntityScan("com.xuecheng.framework.domain.learning")//扫描实体类
 @ComponentScan(basePackages={"com.xuecheng.api"})//扫描接口
+@ComponentScan(basePackages={"com.xuecheng.learning"})//扫描接口
 @ComponentScan(basePackages={"com.xuecheng.framework"})//扫描common下的所有类
-public class ManageCourseApplication {
+public class LearningApplication {
+
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(ManageCourseApplication.class, args);
+        SpringApplication.run(LearningApplication.class, args);
     }
+
     @Bean
-    @LoadBalanced//支持负载均衡
-    public RestTemplate restTemplate(){
+    @LoadBalanced
+    public RestTemplate restTemplate() {
         return new RestTemplate(new OkHttp3ClientHttpRequestFactory());
     }
 }
