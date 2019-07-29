@@ -1,7 +1,9 @@
 package com.xuecheng.auth.service;
 
+import com.xuecheng.auth.client.UserClient;
 import com.xuecheng.framework.domain.ucenter.ext.XcUserExt;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,18 +13,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+    @Autowired
+    UserClient userClient;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (StringUtils.isEmpty(username)) {
             return null;
         }
-        XcUserExt userext = new XcUserExt();
-        if(userext == null){
+        //远程调用用户中心
+        XcUserExt xcUserExt = userClient.getUserext(username);
+//        XcUserExt userext = new XcUserExt();
+        if(xcUserExt == null){
+            //用户为空，返回null，说明用户不存在
             return null;
         }
-        //取出正确密码，这里暂时使用静态密码
-        String password = "123";
+        //根据账号查询xc_user数据库，得到用户的正确密码，
+//        String password = "123";
+        String password  =xcUserExt.getPassword();
 
 
         //权限标识串
@@ -30,6 +38,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         UserJwt userDetails = new UserJwt(username,
                 password,
                 AuthorityUtils.commaSeparatedStringToAuthorityList(user_permission_string));
+
+        //将用户的相关信息加入userDetails，将来在jwt令牌中才包括加入的这些信息
+        //企业id
+        userDetails.setCompanyId(xcUserExt.getCompanyId());
+        //头像
+        userDetails.setUserpic(xcUserExt.getUserpic());
+        //用户名称
+        userDetails.setName(xcUserExt.getName());
+        //用户类型
+        userDetails.setUtype(xcUserExt.getUtype());
+        //用户id
+        userDetails.setId(xcUserExt.getId());
 
        /* UserDetails userDetails = new org.springframework.security.core.userdetails.User(username,
                 password,

@@ -1,8 +1,12 @@
 package com.xuecheng.api.auth;
 
 import com.xuecheng.framework.domain.ucenter.request.LoginRequest;
+import com.xuecheng.framework.domain.ucenter.response.JwtResult;
 import com.xuecheng.framework.domain.ucenter.response.LoginResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 
@@ -11,4 +15,12 @@ public interface AuthControllerApi {
 
     @PostMapping("/userlogin")
     public LoginResult login(LoginRequest loginRequest);
+
+    @GetMapping("/userjwt")
+    @ApiOperation("查询用户的jwt令牌")
+    public JwtResult userjwt();
+
+    @PostMapping("/userlogout")
+    @ApiOperation("退出")
+    public ResponseResult logout();
 }

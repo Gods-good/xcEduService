@@ -3,15 +3,20 @@ package com.xuecheng.auth.web.controller;
 import com.xuecheng.api.auth.AuthControllerApi;
 import com.xuecheng.auth.service.AuthService;
 import com.xuecheng.framework.domain.ucenter.ext.AuthToken;
+import com.xuecheng.framework.domain.ucenter.ext.UserTokenStore;
 import com.xuecheng.framework.domain.ucenter.request.LoginRequest;
+import com.xuecheng.framework.domain.ucenter.response.JwtResult;
 import com.xuecheng.framework.domain.ucenter.response.LoginResult;
 import com.xuecheng.framework.model.response.CommonCode;
+import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.framework.utils.CookieUtil;
 import com.xuecheng.framework.web.BaseController;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 
 @RestController
@@ -50,9 +55,46 @@ public class AuthController extends BaseController implements AuthControllerApi 
         return new LoginResult(CommonCode.SUCCESS,access_token);
     }
 
+    @Override
+    public JwtResult userjwt() {
+        //取出cookie中的token
+        String token = getTokenFormCookie();
+        //根据token查询redis中jwt
+        UserTokenStore userTokenStore = authService.getUserToken(token);
+        //返回jwt
+        return new JwtResult(CommonCode.SUCCESS,userTokenStore.getJwt_token());
+    }
+
+    @Override
+    public ResponseResult logout() {
+
+        //从cookie中取出token
+        String token = getTokenFormCookie();
+
+        //删除redis中token
+        authService.deleteTokenFromRedis(token);
+
+        //清除 cookie
+        clearToken();
+
+        return new ResponseResult(CommonCode.SUCCESS);
+    }
+    //清除cookie
+    private void clearToken(){
+        CookieUtil.addCookie(response,cookieDomain,"/","uid","",0,false);
+
+    }
+
     //存储令牌到cookie
     private void saveTokenToCookie(String token){
-        CookieUtil.addCookie(response,cookieDomain,"/","uid",token,cookieMaxAge,true);
+        CookieUtil.addCookie(response,cookieDomain,"/","uid",token,cookieMaxAge,false);
+
+    }
+
+    //取出 cookie中名称为uid的值
+    private String getTokenFormCookie(){
+        Map<String, String> stringMap = CookieUtil.readCookie(request, "uid");
+        return stringMap.get("uid");
 
     }
 }
