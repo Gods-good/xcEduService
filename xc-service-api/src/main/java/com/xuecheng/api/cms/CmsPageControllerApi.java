@@ -26,6 +26,7 @@ public interface CmsPageControllerApi {
             @ApiImplicitParam(name="size",value="每页记录数",paramType="path")
 
     })
+
     @GetMapping(API_PRE+"/list/{page}/{size}")
     public QueryResponseResult<CmsPage> findList(@PathVariable("page") int page, @PathVariable("size") int size, QueryPageRequest queryPageRequest);
 

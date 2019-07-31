@@ -101,7 +101,6 @@ public class AuthService {
     private AuthToken applyToken(String username,String password,String clientId,String clientSecret){
 
         //采用客户端负载均衡，从eureka获取认证服务的ip 和端口和/auth根路径
-        //采用客户端负载均衡，从eureka获取认证服务的ip 和端口
         ServiceInstance serviceInstance = loadBalancerClient.choose(XcServiceList.XC_SERVICE_UCENTER_AUTH);
         URI uri = serviceInstance.getUri();
         String authUrl = uri+"/auth/oauth/token";

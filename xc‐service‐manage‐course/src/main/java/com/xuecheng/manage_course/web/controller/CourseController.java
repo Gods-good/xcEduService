@@ -15,6 +15,7 @@ import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_course.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class CourseController implements CourseControllerApi {
     @Autowired
     CourseService courseService;
+
+    //指定拥有哪些权限可以访问此方法
+    @PreAuthorize("hasAuthority('course_find_list')")
     @Override
     public QueryResponseResult<CourseInfo> findCourseList(@PathVariable("page") int page, @PathVariable("size") int size, CourseListRequest courseListRequest) {
         return courseService.findCourseList(page,size,courseListRequest);
@@ -34,7 +38,7 @@ public class CourseController implements CourseControllerApi {
     public AddCourseResult addCourseBase(@RequestBody CourseBase courseBase) {
         return courseService.add(courseBase);
     }
-
+    @PreAuthorize("hasAuthority('teachplan_find_list')")
     @Override
     public TeachplanNode findTeachplanList(@PathVariable("courseId") String courseId) {
         return courseService.findTeachplanList(courseId);
@@ -49,7 +53,7 @@ public class CourseController implements CourseControllerApi {
     public ResponseResult addCoursePic(@RequestParam("courseId") String courseId, @RequestParam("pic") String pic) {
         return courseService.saveCoursePic(courseId,pic);
     }
-
+    @PreAuthorize("hasAuthority('coursepic_find_list')")
     @Override
     public CoursePic findCoursePicList(@PathVariable("courseId") String courseId) {
         return courseService.findCoursepicList(courseId);

@@ -1,6 +1,7 @@
 package com.xuecheng.auth.service;
 
 import com.xuecheng.auth.client.UserClient;
+import com.xuecheng.framework.domain.ucenter.XcMenu;
 import com.xuecheng.framework.domain.ucenter.ext.XcUserExt;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -34,7 +38,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 
         //权限标识串
-        String user_permission_string  = "";
+//        String user_permission_string  = "course_find_list,coursepic_find_list";//多个权限中间以逗号分隔
+        List<XcMenu> xcMenus = xcUserExt.getPermissions();
+        List<String> permissions = new ArrayList<>();
+        for(XcMenu xcMenu:xcMenus){
+            //权限标识符
+            String code = xcMenu.getCode();
+            permissions.add(code);
+        }
+        //将permissions数据拼接成字符串，中间以逗号分隔
+        String user_permission_string = StringUtils.join(permissions.toArray(),",");
         UserJwt userDetails = new UserJwt(username,
                 password,
                 AuthorityUtils.commaSeparatedStringToAuthorityList(user_permission_string));
@@ -48,6 +61,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userDetails.setName(xcUserExt.getName());
         //用户类型
         userDetails.setUtype(xcUserExt.getUtype());
+
         //用户id
         userDetails.setId(xcUserExt.getId());
 

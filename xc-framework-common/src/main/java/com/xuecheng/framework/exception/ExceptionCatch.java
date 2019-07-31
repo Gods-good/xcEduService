@@ -25,7 +25,7 @@ public class ExceptionCatch {
     //ImmutableMap是不可变
     private ImmutableMap<Class<? extends Throwable>,ResultCode> EXCEPTIONS;
     //用于构建ImmutableMap的数据
-    private static ImmutableMap.Builder<Class<? extends Throwable>,ResultCode> builder = ImmutableMap.builder();
+    protected static ImmutableMap.Builder<Class<? extends Throwable>,ResultCode> builder = ImmutableMap.builder();
 
     //捕获不可预知异常
     @ExceptionHandler(Exception.class)
