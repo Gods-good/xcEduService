@@ -78,7 +78,7 @@ public class CourseService {
     private String previewUrl;
 
     //查询课程列表
-    public QueryResponseResult<CourseInfo> findCourseList(int page,int size,CourseListRequest courseListRequest){
+    public QueryResponseResult<CourseInfo> findCourseList(String company_id,int page,int size,CourseListRequest courseListRequest){
         if(page<0){
             page = 1;
         }
@@ -88,6 +88,8 @@ public class CourseService {
         //调用dao
         //设置分页参数
         PageHelper.startPage(page,size);
+        //company_id传给 dao
+        courseListRequest.setCompanyId(company_id);
         Page<CourseInfo> courseListPage = courseBaseMapper.findCourseListPage(courseListRequest);
         //列表
         List<CourseInfo> list = courseListPage.getResult();

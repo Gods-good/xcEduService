@@ -13,6 +13,8 @@ import com.xuecheng.framework.domain.course.response.AddCourseResult;
 import com.xuecheng.framework.domain.course.response.CoursePublishResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.ResponseResult;
+import com.xuecheng.framework.utils.XcOauth2Util;
+import com.xuecheng.framework.web.BaseController;
 import com.xuecheng.manage_course.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,9 +23,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+/**
+ * @author Administrator
+ * @version 1.0
+ * @create 2018-06-30 11:51
+ **/
 @RestController
-public class CourseController implements CourseControllerApi {
+public class CourseController extends BaseController implements CourseControllerApi {
     @Autowired
     CourseService courseService;
 
@@ -31,14 +37,22 @@ public class CourseController implements CourseControllerApi {
     @PreAuthorize("hasAuthority('course_find_list')")
     @Override
     public QueryResponseResult<CourseInfo> findCourseList(@PathVariable("page") int page, @PathVariable("size") int size, CourseListRequest courseListRequest) {
-        return courseService.findCourseList(page,size,courseListRequest);
+        //使用工具类获取当前用户
+        XcOauth2Util xcOauth2Util = new XcOauth2Util();
+        //当前用户
+        XcOauth2Util.UserJwt userJwt = xcOauth2Util.getUserJwtFromHeader(request);
+        //当前用户的所属公司Id
+        String company_id  =userJwt.getCompanyId();
+        return courseService.findCourseList(company_id,page,size,courseListRequest);
     }
 
     @Override
     public AddCourseResult addCourseBase(@RequestBody CourseBase courseBase) {
         return courseService.add(courseBase);
     }
-    @PreAuthorize("hasAuthority('teachplan_find_list')")
+
+
+    //    @PreAuthorize("hasAuthority('teachplan_find_list')")
     @Override
     public TeachplanNode findTeachplanList(@PathVariable("courseId") String courseId) {
         return courseService.findTeachplanList(courseId);
@@ -53,7 +67,8 @@ public class CourseController implements CourseControllerApi {
     public ResponseResult addCoursePic(@RequestParam("courseId") String courseId, @RequestParam("pic") String pic) {
         return courseService.saveCoursePic(courseId,pic);
     }
-    @PreAuthorize("hasAuthority('coursepic_find_list')")
+
+    //    @PreAuthorize("hasAuthority('coursepic_find_list')")
     @Override
     public CoursePic findCoursePicList(@PathVariable("courseId") String courseId) {
         return courseService.findCoursepicList(courseId);
@@ -65,17 +80,18 @@ public class CourseController implements CourseControllerApi {
     }
 
     @Override
-    public CourseView courseview(@PathVariable("id")String id) {
+    public CourseView courseview(@PathVariable("id") String id) {
         return courseService.getCoruseView(id);
     }
 
     @Override
-    public CoursePublishResult preview(@PathVariable("id")String id) {
+    public CoursePublishResult preview(@PathVariable("id") String id) {
         return courseService.preview(id);
     }
 
     @Override
-    public CoursePublishResult publish(@PathVariable("id")String id) {
+    public CoursePublishResult publish(@PathVariable("id") String id) {
+        //发布课程
         return courseService.publish(id);
     }
 

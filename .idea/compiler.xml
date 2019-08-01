@@ -19,6 +19,7 @@
         <module name="xc-service-manage-cms" />
         <module name="xc-service-manage-media" />
         <module name="xc-service-manage-media-processor" />
+        <module name="xc-service-manage-order" />
         <module name="xc-service-search" />
         <module name="xc-service-ucenter-auth" />
         <module name="xc‐service‐base‐filesystem" />
@@ -43,6 +44,7 @@
       <module name="xc-service-manage-cms" target="1.8" />
       <module name="xc-service-manage-media" target="1.8" />
       <module name="xc-service-manage-media-processor" target="1.8" />
+      <module name="xc-service-manage-order" target="1.8" />
       <module name="xc-service-search" target="1.8" />
       <module name="xc-service-ucenter-auth" target="1.8" />
       <module name="xc‐service‐base‐filesystem" target="1.8" />
