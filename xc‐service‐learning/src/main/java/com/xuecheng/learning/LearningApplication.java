@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 @EnableDiscoveryClient
 @EnableFeignClients
 @SpringBootApplication
-@EntityScan("com.xuecheng.framework.domain.learning")//扫描实体类
+@EntityScan(value = {"com.xuecheng.framework.domain.learning","com.xuecheng.framework.domain.task"})//扫描实体类
 @ComponentScan(basePackages={"com.xuecheng.api"})//扫描接口
 @ComponentScan(basePackages={"com.xuecheng.learning"})//扫描接口
 @ComponentScan(basePackages={"com.xuecheng.framework"})//扫描common下的所有类
@@ -30,4 +30,5 @@ public class LearningApplication {
     public RestTemplate restTemplate() {
         return new RestTemplate(new OkHttp3ClientHttpRequestFactory());
     }
+
 }

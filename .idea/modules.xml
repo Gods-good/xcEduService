@@ -7,8 +7,11 @@
       <module fileurl="file://$PROJECT_DIR$/test-rabbitmq-consumer/test-rabbitmq-consumer.iml" filepath="$PROJECT_DIR$/test-rabbitmq-consumer/test-rabbitmq-consumer.iml" />
       <module fileurl="file://$PROJECT_DIR$/test-rabbitmq-producer/test-rabbitmq-producer.iml" filepath="$PROJECT_DIR$/test-rabbitmq-producer/test-rabbitmq-producer.iml" />
       <module fileurl="file://$PROJECT_DIR$/xc-framework-common/xc-framework-common.iml" filepath="$PROJECT_DIR$/xc-framework-common/xc-framework-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xc-framework-common/xc-framework-common.iml" filepath="$PROJECT_DIR$/xc-framework-common/xc-framework-common.iml" />
       <module fileurl="file://$PROJECT_DIR$/xc-framework-model/xc-framework-model.iml" filepath="$PROJECT_DIR$/xc-framework-model/xc-framework-model.iml" />
       <module fileurl="file://$PROJECT_DIR$/xc-framework-parent/xc-framework-parent.iml" filepath="$PROJECT_DIR$/xc-framework-parent/xc-framework-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xc-framework-parent/xc-framework-parent.iml" filepath="$PROJECT_DIR$/xc-framework-parent/xc-framework-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xc-framework-utils/xc-framework-utils.iml" filepath="$PROJECT_DIR$/xc-framework-utils/xc-framework-utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/xc-framework-utils/xc-framework-utils.iml" filepath="$PROJECT_DIR$/xc-framework-utils/xc-framework-utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/xc-govern-center/xc-govern-center.iml" filepath="$PROJECT_DIR$/xc-govern-center/xc-govern-center.iml" />
       <module fileurl="file://$PROJECT_DIR$/xc-govern-gateway/xc-govern-gateway.iml" filepath="$PROJECT_DIR$/xc-govern-gateway/xc-govern-gateway.iml" />
